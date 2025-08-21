@@ -1,30 +1,37 @@
 "use client"
 import React from 'react'
+import { useState } from 'react'
 import Script from 'next/script'
+import { params } from 'next/navigation';
 import { initiate } from '@/actions/useraction'
 
 const PaymentPage = ({ username }) => {
-    const [paymentform, setpaymentform] = useState(second)
+    const [paymentform, setpaymentform] = useState({
+        name: "",
+        amount: "",
+        message: ""
+    })
 
-    handleChange = (e) => {
-        setpaymentform({...paymentform,[e.target.name]: e.target.value})
+    const handleChange = (e) => {
+        setpaymentform({ ...paymentform, [e.target.name]: e.target.value })
     }
 
-    const pay = async (amount, orderID) => {
+    const pay = async (amount) => {
 
         //get thr order id
-        let a = await initiate(amount, session?.user.name, paymentform)
+        let a = await initiate(amount, username, paymentform)
         let orderID = a.id
-
+        console.log(process.env.NEXT_PUBLIC_KEY_ID, process.env.NEXT_PUBLIC_KEY_SECRET, process.env.NEXT_PUBLIC_URL);
+        
         var options = {
-            "key": process.env.KEY_ID, // Enter the Key ID generated from the Dashboard
+            "key": process.env.NEXT_PUBLIC_KEY_ID, // Enter the Key ID generated from the Dashboard
             "amount": amount, // Amount is in currency subunits. 
             "currency": "INR",
             "name": "Get Me A Chai", //your business name
             "description": "Test Transaction",
-            "image": "https://example.com/your_logo",
+            "image": `${process.env.NEXT_PUBLIC_URL}/tea.gif`, //A sample image url
             "order_id": orderID, // This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-            "callback_url": `${process.env.URL}/api/razorpay`,
+            "callback_url": `${process.env.NEXT_PUBLIC_URL}/api/razorpay`,
             "prefill": { //We recommend using the prefill parameter to auto-fill customer's contact information especially their phone number
                 "name": "Gaurav Kumar", //your customer's name
                 "email": "gaurav.kumar@example.com",
@@ -69,11 +76,16 @@ const PaymentPage = ({ username }) => {
                     <div className="makePayment w-1/2 bg-slate-900 rounded-lg p-5">
                         <h2 className='text-lg font-bold'>Make a Payment</h2>
                         <form className='flex flex-col gap-3 mt-5'>
-                            <input type="text" placeholder='Enter Name' onChange={handleChange()} value={paymentform.name} className='bg-slate-800 p-2 rounded-lg' />
-                            <input type="text" placeholder='Enter Amount' onChange={handleChange()} value={paymentform.amount} className='bg-slate-800 p-2 rounded-lg' />
-                            <textarea placeholder='Message to creator' onChange={handleChange()} value={paymentform.message} className='bg-slate-800 p-2 rounded-lg' />
+                            <input type="text" placeholder='Enter Name' name='name' onChange={handleChange} value={paymentform.name} className='bg-slate-800 p-2 rounded-lg' />
+                            <input type="text" placeholder='Enter Amount' name='amount' onChange={handleChange} value={paymentform.amount} className='bg-slate-800 p-2 rounded-lg' />
+                            <textarea placeholder='Message to creator' name='message' onChange={handleChange} value={paymentform.message} className='bg-slate-800 p-2 rounded-lg' />
                             <button className=' cursor-pointer bg-blue-500 text-white p-2 rounded-lg'>Pay</button>
                         </form>
+                        <div className='flex flex-col md:flex-row gap-2 mt-5'>
+                            <button className='bg-slate-800 p-3 rounded-lg' onClick={() => pay(1000)}>Pay ₹10</button>
+                            <button className='bg-slate-800 p-3 rounded-lg' onClick={() => pay(2000)}>Pay ₹20</button>
+                            <button className='bg-slate-800 p-3 rounded-lg' onClick={() => pay(3000)}>Pay ₹30</button>
+                        </div>
                     </div>
                 </div>
             </div>
