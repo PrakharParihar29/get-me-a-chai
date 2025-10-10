@@ -6,18 +6,17 @@ import User from '@/models/User';
 
 const Username = async({ params }) => {
 
+  const { username } = await params;
 // If the username is not present in the database, show a 404 page
   const checkUser = async () => {
     await connectDB()
-    let u = await User.findOne({ username: params.username })
+    let u = await User.findOne({ username: username })
     if (!u) {
       return notFound()
     }
   }
 
   await checkUser()
-
-  const { username } = await params;
 
   return (
     <>
@@ -29,7 +28,8 @@ const Username = async({ params }) => {
 export default Username
 
 export async function generateMetadata({ params }) {
+  const { username } = await params;
   return {
-    title: `${params.username} - Get Me A Chai`,
+    title: `${username} - Get Me A Chai`,
   }
 }
