@@ -30,6 +30,13 @@ export const authOptions = NextAuth({
       }
     },
 
+    async jwt({ token, user }) {
+      if (user) {
+        token.username = user.username; // or whatever field you need
+      }
+      return token;
+    },
+
     async session({ session, user, token }) {
       const dbUser = await User.findOne({ email: session.user.email })
       session.user.name = dbUser.username
