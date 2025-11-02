@@ -13,8 +13,9 @@ export const authOptions = NextAuth({
     }),
     // ...add more providers here
   ],
+
   callbacks: {
-    async signIn({ user, account, profile, email, credentials }) {
+    async signIn({ user, account }) {
       if (account.provider === 'github') {
         await connectDB()
         //check if user already exists
