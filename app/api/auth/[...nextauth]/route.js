@@ -27,8 +27,8 @@ export const authOptions = NextAuth({
           })
           await newUser.save()
         }
-        return true
       }
+      return true
     },
 
     async jwt({ token, user }) {
