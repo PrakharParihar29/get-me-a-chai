@@ -1,8 +1,7 @@
 import NextAuth from "next-auth"
 import GithubProvider from "next-auth/providers/github"
-import mongoose from "mongoose"
+import Google from "next-auth/providers/google"
 import User from "@/models/User"
-import Payment from "@/models/Payment"
 import connectDB from "@/db/connectDB"
 
 export const authOptions = NextAuth({
@@ -11,12 +10,15 @@ export const authOptions = NextAuth({
       clientId: process.env.GITHUB_ID,
       clientSecret: process.env.GITHUB_SECRET,
     }),
-    // ...add more providers here
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    }),
   ],
 
   callbacks: {
     async signIn({ user, account }) {
-      if (account.provider === 'github') {
+      if (account.provider === 'github' || account.provider === 'google') {
         await connectDB()
         //check if user already exists
         const currUser = await User.findOne({ email: user.email })
@@ -33,7 +35,7 @@ export const authOptions = NextAuth({
 
     async jwt({ token, user }) {
       if (user) {
-        token.username = user.username; // or whatever field you need
+        token.username = user.username;
       }
       return token;
     },
