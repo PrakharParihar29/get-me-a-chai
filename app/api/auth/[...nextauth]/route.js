@@ -19,19 +19,30 @@ export const authOptions = NextAuth({
   callbacks: {
     async signIn({ user, account }) {
       if (account.provider === 'github' || account.provider === 'google') {
-        await connectDB()
-        //check if user already exists
-        const currUser = await User.findOne({ email: user.email })
-        if (!currUser) {
-          const newUser = User.create({
-            email: user.email,
-            username: user.email.split("@")[0],
-          })
-          await newUser.save()
+        await connectDB();
+
+        try {
+          const currUser = await User.findOne({ email: user.email });
+
+          if (!currUser) {
+            const newUser = new User({
+              email: user.email,
+              username: user.email.split("@")[0],
+            });
+
+            await newUser.save();
+          }
+        } catch (err) {
+          console.error("Error during user sign-in:", err);
+          return false;
         }
       }
-      return true
+
+      return true;
+
     },
+
+
 
     async jwt({ token, user }) {
       if (user) {
